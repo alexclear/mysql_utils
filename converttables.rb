@@ -10,18 +10,18 @@ Mysql.new('localhost', '', '', 'information_schema') do |con|
   end
   schemas.keys.each do |schema|
     puts "Processing schema: #{schema}"
-    con_schema = Mysql.new('localhost', '', '', schema)
-    schemas[schema].each do |table|
-      puts "Processing table: #{table}"
-      begin
-        con_schema.query("ALTER TABLE #{table} ENGINE=InnoDB")
-      rescue Mysql::Error => e
-        puts "Error code: #{e.errno}"
-        puts "Error message: #{e.error}"
-        puts "Error SQLSTATE: #{e.sqlstate}" if e.respond_to?("sqlstate")
+    Mysql.new('localhost', '', '', schema) do |con_schema|
+      schemas[schema].each do |table|
+        puts "Processing table: #{table}"
+        begin
+          con_schema.query("ALTER TABLE #{table} ENGINE=InnoDB")
+        rescue Mysql::Error => e
+          puts "Error code: #{e.errno}"
+          puts "Error message: #{e.error}"
+          puts "Error SQLSTATE: #{e.sqlstate}" if e.respond_to?("sqlstate")
+        end
       end
     end
-    con_schema.close
   end
 rescue Mysql::Error => e
   puts "Error code: #{e.errno}"
